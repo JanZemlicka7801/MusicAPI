@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using MusicAPI.DTO;
 using MusicAPI.Models;
 
 namespace MusicAPI.Controllers
@@ -17,14 +18,19 @@ namespace MusicAPI.Controllers
 
         // GET: api/Song
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Song>>> GetSongs()
+        public async Task<ActionResult<IEnumerable<SongDto>>> GetSongs()
         {
-            return await _context.Songs.ToListAsync();
+            return await _context.Songs.Select(s => new SongDto()
+            {
+                Id = s.Id,
+                Title = s.Title,
+                AlbumTitle = s.Album.Title
+            }).ToListAsync();
         }
 
         // GET: api/Song/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Song>> GetSong(int id)
+        public async Task<ActionResult<SongDto>> GetSong(int id)
         {
             var song = await _context.Songs.FindAsync(id);
 
@@ -33,7 +39,12 @@ namespace MusicAPI.Controllers
                 return NotFound();
             }
 
-            return song;
+            return new SongDto()
+            {
+                Id = song.Id,
+                Title = song.Title,
+                AlbumTitle = song.Album.Title
+            };
         }
 
         // PUT: api/Song/5
