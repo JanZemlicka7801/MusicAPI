@@ -33,7 +33,7 @@ namespace MusicAPI.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<ArtistDto>> GetArtist(int id)
         {
-            var artist = await _context.Artists.FindAsync(id);
+            var artist = await _context.Artists.Include(a => a.Albums).FirstOrDefaultAsync(a => a.Id == id);
 
             if (artist == null)
             {
