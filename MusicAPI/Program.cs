@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using MusicAPI;
+using MusicAPI.Authentication;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseMiddleware<ApiKeyAuthMiddleware>();
 
 app.UseAuthorization();
 
