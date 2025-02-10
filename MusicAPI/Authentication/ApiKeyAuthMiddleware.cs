@@ -4,10 +4,11 @@ public class ApiKeyAuthMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly IConfiguration _configuration;
-    
-    public ApiKeyAuthMiddleware(RequestDelegate next)
+
+    public ApiKeyAuthMiddleware(RequestDelegate next, IConfiguration configuration)
     {
         _next = next;
+        _configuration = configuration;
     }
 
     public async Task InvokeAsync(HttpContext context)
@@ -16,13 +17,13 @@ public class ApiKeyAuthMiddleware
         if (!context.Request.Headers.TryGetValue(AuthContants.ApiKeyHeaderName, out var extractedApiKey))
         {
             context.Response.StatusCode = 401;
-            await context.Response.WriteAsync("Key is missing");
+            await context.Response.WriteAsync("API Key is missing");
             return;
         }
 
         //Validates the API key
         var apiKey = _configuration.GetValue<string>(AuthContants.ApiKeySectionName);
-        if (!apiKey.Equals(extractedApiKey))
+        if (string.IsNullOrEmpty(apiKey) || !apiKey.Equals(extractedApiKey, StringComparison.OrdinalIgnoreCase))
         {
             context.Response.StatusCode = 401;
             await context.Response.WriteAsync("Invalid API Key");
